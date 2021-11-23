@@ -38,3 +38,6 @@ $('.sect-0').dload({
     }
 });
 ```
+![스크린샷 2021-11-23 오후 12 14 57](https://user-images.githubusercontent.com/6572449/142966303-9dcbf9f8-3f17-440f-9d7f-e8729eae7d3a.png)
+
+
