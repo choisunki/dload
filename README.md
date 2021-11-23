@@ -30,7 +30,7 @@ $('.sect-0').dload({
 
 이미지 몇 개 로드되었는지 살펴보고 싶으면
 
-```
+```javascript
 $('.sect-0').dload({
     cmessage: true,
     cb: function(){
