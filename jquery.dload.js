@@ -1,18 +1,30 @@
 ;(function($){
 
     /**
-        * $.fn.dload
-        * @memberOf jQuery.fn
-        * @param {Function} opts.cb - callback function
-        * @param {boolean} opts.debug - 확인 메시지 노출 여부
-        * @author Choi Sunki <iru@nate.com>
-        * @description 해당 섹션 이미지 로드 후 콜백 주기
-    */
+     * @version v1.0.1
+     * @author Choi Sunki <iru@nate.com>
+     * @description 특정 섹션 내의 이미지들이 모두 로드된 후 콜백을 실행하는 jQuery 플러그인
+     *
+     * @param {Object} opts - 옵션 객체
+     * @param {Function} [opts.cb] - 모든 이미지 로드 후 실행할 콜백 함수
+     * @param {boolean} [opts.cmessage=false] - 콘솔 메시지 출력 여부
+     * 
+     * @example
+     * $('.image-section').dload({
+     *     cb: function() {
+     *         console.log('모든 이미지가 로드되었습니다.');
+     *     },
+     *     cmessage: true
+     * });
+     *
+     * @since v1.0.0 - 초기 버전 작성
+     * @since v1.0.1 - 변수 스코프 문제 해결, 이미지 캐싱 처리 추가, 로드 실패 시 예외 처리 추가
+     */
     $.fn.dload = function(opts) {
 
         return this.each(function() {
             var defaults = {
-                cmessage: 0
+                cmessage: false
             };
             var options = $.extend({}, defaults, opts); // 원본 오염 방지
 
@@ -20,6 +32,10 @@
                 $imgs = $section.find('img'),
                 imgCounts = 0; // 전역 변수가 되지 않도록 명확하게 선언
 
+            /**
+             * 개별 이미지 로드 후 실행되는 콜백 함수
+             * @private
+             */
             var loaded = function() {
                 imgCounts++;
                 if (options.cmessage) {
