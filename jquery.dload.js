@@ -1,16 +1,27 @@
-;(function($){
-
+(function(global) {
     /**
-     * @version v1.0.1
+     * @version v1.0.2
      * @author Choi Sunki <iru@nate.com>
-     * @description 특정 섹션 내의 이미지들이 모두 로드된 후 콜백을 실행하는 jQuery 플러그인
+     * @description 특정 섹션 내의 이미지들이 모두 로드된 후 콜백을 실행하는 유틸리티
+     *              jQuery가 있으면 jQuery 플러그인으로 동작하고, 없으면 바닐라 JavaScript 방식으로 사용 가능
      *
+     * @param {HTMLElement|NodeList} target - 이미지가 포함된 DOM 요소 또는 NodeList
      * @param {Object} opts - 옵션 객체
      * @param {Function} [opts.cb] - 모든 이미지 로드 후 실행할 콜백 함수
      * @param {boolean} [opts.cmessage=false] - 콘솔 메시지 출력 여부
      * 
      * @example
+     * // jQuery 사용 시
      * $('.image-section').dload({
+     *     cb: function() {
+     *         console.log('모든 이미지가 로드되었습니다.');
+     *     },
+     *     cmessage: true
+     * });
+     *
+     * @example
+     * // 바닐라 JS 사용 시
+     * dload(document.querySelector('.image-section'), {
      *     cb: function() {
      *         console.log('모든 이미지가 로드되었습니다.');
      *     },
@@ -19,31 +30,24 @@
      *
      * @since v1.0.0 - 초기 버전 작성
      * @since v1.0.1 - 변수 스코프 문제 해결, 이미지 캐싱 처리 추가, 로드 실패 시 예외 처리 추가
+     * @since v1.0.2 - jQuery 유무에 따라 자동 분기, 바닐라 방식으로도 사용 가능하도록 개선
      */
-    $.fn.dload = function(opts) {
+    function dload(target, opts = {}) {
+        const options = Object.assign({ cmessage: false }, opts);
+        const sections = (target instanceof NodeList || Array.isArray(target)) ? target : [target];
 
-        return this.each(function() {
-            var defaults = {
-                cmessage: false
-            };
-            var options = $.extend({}, defaults, opts); // 원본 오염 방지
+        sections.forEach(section => {
+            const imgs = section.querySelectorAll('img');
+            let loadedCount = 0;
 
-            var $section = $(this),
-                $imgs = $section.find('img'),
-                imgCounts = 0; // 전역 변수가 되지 않도록 명확하게 선언
-
-            /**
-             * 개별 이미지 로드 후 실행되는 콜백 함수
-             * @private
-             */
-            var loaded = function() {
-                imgCounts++;
+            const handleLoaded = () => {
+                loadedCount++;
                 if (options.cmessage) {
-                    console.log(`%c => Loading ${imgCounts}ea`, 'background: #111; color: green; border-radius: 2px;');
+                    console.log(`%c => Loading ${loadedCount}ea`, 'background: #111; color: green; border-radius: 2px;');
                 }
-                if (imgCounts === $imgs.length) {
+                if (loadedCount === imgs.length) {
                     if (options.cmessage) {
-                        console.log(`%c Load Complete ${imgCounts}ea`, 'background: green; color: #111; border-radius: 2px; padding: 5px 10px;');
+                        console.log(`%c Load Complete ${loadedCount}ea`, 'background: green; color: #111; border-radius: 2px; padding: 5px 10px;');
                     }
                     if (typeof options.cb === 'function') {
                         options.cb();
@@ -51,20 +55,29 @@
                 }
             };
 
-            $imgs.each(function() {
-                var img = new Image();
-                img.onload = loaded;
-                img.onerror = loaded; // 오류 발생 시에도 카운트 증가 (무한 대기 방지)
-                img.src = $(this).attr('src');
+            imgs.forEach(imgEl => {
+                const img = new Image();
+                img.onload = handleLoaded;
+                img.onerror = handleLoaded;
+                img.src = imgEl.getAttribute('src');
 
-                // 이미 캐싱된 이미지 처리
                 if (img.complete) {
-                    loaded();
+                    handleLoaded();
                 }
             });
-
         });
+    }
 
-    };
+    // jQuery 감싸기
+    if (typeof jQuery !== 'undefined' && typeof jQuery.fn === 'object') {
+        jQuery.fn.dload = function(opts) {
+            return this.each(function() {
+                dload(this, opts);
+            });
+        };
+    }
 
-})(jQuery);
+    // 글로벌로 내보내기
+    global.dload = dload;
+
+})(typeof window !== 'undefined' ? window : this);
