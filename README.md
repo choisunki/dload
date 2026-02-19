@@ -14,7 +14,7 @@
 ## 사용법
 문서에 `jQuery.dload`를 심자.
 ```javascript
-//cdn.jsdelivr.net/gh/choisunki/dload@master/jquery.dload.js
+//cdn.jsdelivr.net/gh/choisunki/dload@1.0.3/jquery.dload.js
 ```
 
 그리고 사용하자.
@@ -22,6 +22,32 @@
 $('.sect-0').dload({
     cb: function(){
         // 여기에 효과를 준다.
+    }
+});
+```
+
+## 1.0.3 변경사항
+
+- 섹션 내 이미지가 0개여도 `cb`가 즉시 실행됨
+- `lazy` 속성 이미지도 로드 대상으로 처리함
+  - `src`, `data-src`, `data-original`, `data-lazy`
+  - `srcset`, `data-srcset`
+- 이미지 로드 실패(`error`)도 완료로 처리하여 콜백이 멈추지 않음
+
+### lazy 이미지 예시
+
+```html
+<section class="sect-0">
+    <img data-src="https://example.com/a.jpg" alt="">
+    <img data-original="https://example.com/b.jpg" alt="">
+    <img data-srcset="https://example.com/c-640.jpg 640w, https://example.com/c-1280.jpg 1280w" data-src="https://example.com/c-640.jpg" alt="">
+</section>
+```
+
+```javascript
+$('.sect-0').dload({
+    cb: function(){
+        // lazy 소스까지 로드 카운트가 끝난 뒤 실행
     }
 });
 ```
@@ -39,5 +65,3 @@ $('.sect-0').dload({
 });
 ```
 ![스크린샷 2021-11-23 오후 12 14 57](https://user-images.githubusercontent.com/6572449/142966303-9dcbf9f8-3f17-440f-9d7f-e8729eae7d3a.png)
-
-
