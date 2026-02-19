@@ -30,7 +30,7 @@ $('.sect-0').dload({
 
 - 섹션 내 이미지가 0개여도 `cb`가 즉시 실행됨
 - `lazy` 속성 이미지도 로드 대상으로 처리함
-  - `src`, `data-src`, `data-original`, `data-lazy`
+  - `src`, `data-src`, `data-origin`, `data-original`, `data-lazy`
   - `srcset`, `data-srcset`
 - 이미지 로드 실패(`error`)도 완료로 처리하여 콜백이 멈추지 않음
 
